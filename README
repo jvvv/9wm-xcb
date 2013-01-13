@@ -16,8 +16,9 @@ outputs a vast amount of info that will make your X log files bulge.
 For bug reports, see the 9wm-xcb github page. No new features will be added
 to 9wm-xcb, but wishlist items may be concidered for future plans on a new
 window manager I plan to write this year.
- 
 
+ 
+Original README for the pre-9wm-1.2.tar.gz archive:
 
                            9wm Version 1.2
                    Copyright 1994-1996 David Hogan.
