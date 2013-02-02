@@ -383,7 +383,7 @@ static int _getprop(xcb_window_t w, xcb_atom_t a, xcb_atom_t type, int32_t len, 
 	prop_r = xcb_get_property_reply(dpy, prop_c, &errp);
 	if (!prop_r)
 	{
-		fprintf(stderr, "ewm: getwinprop: w=0x%x a=0x%x type=0x%x len=%d\n",
+		fprintf(stderr, "ewm: _getprop: w=0x%x a=0x%x type=0x%x len=%d\n",
 				w, a, type, len);
 		handler(&err);
 		return 1;
