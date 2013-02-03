@@ -21,6 +21,9 @@ int manage(Client *c, int mapped)
 	uint32_t mask;
 	uint32_t values[2];
 
+	if (!c)
+		return 0;
+
 	eprintf("c=0x%x mapped=%d (c->window=0x%x)\n", c, mapped, c->window);
 	trace("manage", c, 0);
 	xselectinput(dpy, c->window, (XCB_EVENT_MASK_COLOR_MAP_CHANGE |
@@ -241,7 +244,11 @@ void gettrans(Client *c)
 	xcb_window_t trans;
 	xcb_get_property_cookie_t prop_c;
 
+	if (!c)
+		return;
+
 	eprintf("c=0x%x (c->window=0x%x)\n", c, c->window);
+
 	prop_c = xcb_icccm_get_wm_transient_for_unchecked(dpy, c->window);
 	if(xcb_icccm_get_wm_transient_for_reply(dpy, prop_c, &trans, NULL))
 		c->trans = trans;
@@ -251,7 +258,11 @@ void gettrans(Client *c)
 
 void withdraw(Client *c)
 {
+	if (!c)
+		return;
+
 	eprintf("c=0x%x (c->window=0x%x)\n", c, c->window);
+
 	xcb_unmap_window(dpy, c->parent);
 	gravitate(c, 1);
 	xcb_reparent_window(dpy, c->window, c->screen->root, c->x, c->y);
@@ -269,7 +280,11 @@ void gravitate(Client *c, int invert)
 {
 	int gravity, dx, dy, delta;
 
+	if (!c)
+		return;
+
 	eprintf("c=0x%x invert=%d (c->window=0x%x)\n", c, invert, c->window);
+
 	gravity = XCB_GRAVITY_NORTH_WEST;
 	if (c->size.flags & XCB_ICCCM_SIZE_HINT_P_WIN_GRAVITY)
 		gravity = c->size.win_gravity;
@@ -331,6 +346,7 @@ void gravitate(Client *c, int invert)
 static void installcmap(ScreenInfo *s, xcb_colormap_t cmap)
 {
 	eprintf("s=0x%x cmap=%d\n", s, cmap);
+
 	if (cmap == XCB_NONE)
 		xcb_install_colormap(dpy, s->def_cmap);
 	else
@@ -342,10 +358,13 @@ void cmapfocus(Client *c)
 	int i, found;
 	Client *cc;
 
-	eprintf("c=0x%x (c->window=0x%x)\n", c, c->window);
-	if (c == 0)
+	if (!c)
 		return;
-	else if (c->ncmapwins != 0) {
+
+	eprintf("c=0x%x (c->window=0x%x)\n", c, c->window);
+
+	if (c->ncmapwins != 0)
+	{
 		found = 0;
 		for (i = c->ncmapwins - 1; i >= 0; i--)
 		{
@@ -367,6 +386,7 @@ void cmapfocus(Client *c)
 void cmapnofocus(ScreenInfo *s)
 {
 	eprintf("s=0x%x\n", s);
+
 	installcmap(s, XCB_NONE);
 }
 
@@ -443,7 +463,11 @@ void getcmaps(Client *c)
 	xcb_get_window_attributes_reply_t *gatt_r;
 	uint32_t value;
 
+	if (!c)
+		return;
+
 	eprintf("c=0x%x (c->window=0x%x)\n", c, c->window);
+
 	if (!c->init)
 	{
 		gatt_c = xcb_get_window_attributes_unchecked(dpy, c->window);
@@ -494,7 +518,11 @@ void setlabel(Client *c)
 {
 	char *label, *p;
 
+	if (!c)
+		return;
+
 	eprintf("c=0x%x (c->window=0x%x)\n", c, c->window);
+
 	if (c->iconname != 0)
 		label = c->iconname;
 	else if (c->name != 0)
@@ -516,7 +544,11 @@ void setshape(Client *c)
 	xcb_shape_get_rectangles_cookie_t shape_c;
 	xcb_shape_get_rectangles_reply_t *shape_r;
 
+	if (!c)
+		return;
+
 	eprintf("c=0x%x (c->window=0x%x)\n", c, c->window);
+
 	shape_c = xcb_shape_get_rectangles_unchecked(dpy, c->window,
 						XCB_SHAPE_SK_BOUNDING);
 	shape_r = xcb_shape_get_rectangles_reply(dpy, shape_c, NULL);
@@ -538,6 +570,7 @@ char *getprop(xcb_window_t w, xcb_atom_t a)
 	void *p;
 
 	eprintf("w=0x%x a=%d\n", w, a);
+
 	if (_getprop(w, a, XCB_ATOM_STRING, 100L, &p) <= 0)
 		return 0;
 	return (char *)p;
@@ -549,21 +582,25 @@ int get1prop(xcb_window_t w, xcb_atom_t a, xcb_atom_t type)
 	int x;
 
 	eprintf("w=0x%x a=%d type=%d\n", w, a, type);
+
 	if (_getprop(w, a, type, 1L, p) <= 0)
 		return 0;
 	memcpy(&x, *p, sizeof(int));
+
 	return x;
 }
 
 xcb_window_t getwprop(xcb_window_t w, xcb_atom_t a)
 {
 	eprintf("w=0x%x a=%d\n", w, a);
+
 	return get1prop(w, a, XCB_ATOM_WINDOW);
 }
 
 int getiprop(xcb_window_t w, xcb_atom_t a)
 {
 	eprintf("w=0x%x a=%d\n", w, a);
+
 	return get1prop(w, a, XCB_ATOM_INTEGER);
 }
 
@@ -571,7 +608,11 @@ void set_state(Client *c, int state)
 {
 	uint32_t values[2];
 
+	if (!c)
+		return;
+
 	eprintf("c=0x%x state=%d (c->window=0x%x)\n", c, state, c->window);
+
 	values[0] = state;
 	values[1] = XCB_NONE;
 
@@ -586,6 +627,10 @@ int get_state(xcb_window_t w, int *state)
 	void *p = 0;
 
 	eprintf("w=0x%x state=0x%x\n", w, state);
+	
+	if (!w)
+		return;
+
 	if (_getprop(w, wm_state, wm_state, 2L, &p) <= 0)
 		return 0;
 
@@ -601,7 +646,11 @@ void getproto(Client *c)
 	long n;
 	xcb_window_t w;
 
+	if (!c)
+		return;
+
 	eprintf("c=0x%x (c->window=0x%x)\n", c, c->window);
+
 	w = c->window;
 	c->proto = 0;
 	if ((n = _getprop(w, wm_protocols, XCB_ATOM_ATOM,
