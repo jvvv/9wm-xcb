@@ -182,6 +182,11 @@ Client * getclient(xcb_window_t w, int create)
 		return 0;
 
 	c = (Client *)malloc(sizeof(Client));
+	if (!c)
+	{
+		fprintf(stderr, "Memory allocation error\n");
+		exit(EXIT_FAILURE);
+	}
 	memset(c, 0, sizeof(Client));
 	c->window = w;
 	/* c->parent will be set by the caller */
@@ -244,22 +249,22 @@ void rmclient(Client *c)
 		}
 	}
 	if (c->label)
-		xfree(c->label);
+		free(c->label);
 	if (c->instance)
-		xfree(->instance);
+		free(c->instance);
 	if (c->class)
-		xfree(c->class);
+		free(c->class);
 	if (c->name)
-		xfree(c->name);
+		free(c->name);
 	if (c->iconname)
-		xfree(c->iconname)
+		free(c->iconname);
 	if (c->ncmapwins != 0)
 	{
-		xfree((char *)c->cmapwins);
-		xfree((char *)c->wmcmaps);
+		free((char *)c->cmapwins);
+		free((char *)c->wmcmaps);
 	}
 	memset(c, 0, sizeof(Client));		/* paranoia */
-	xfree(c);
+	free(c);
 }
 
 #ifdef	DEBUG
