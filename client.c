@@ -12,6 +12,12 @@ Client	*current;
 
 void setactive(Client *c, int on)
 {
+	if (!c)
+	{
+		eprintf("null client\n");
+		return;
+	}
+
 	eprintf("c=0x%x on=%d (c->window=0x%x)\n", c, on, c->window);
 
 	if (c->parent == c->screen->root)
@@ -44,6 +50,12 @@ void draw_border(Client *c, int active)
 	xcb_rectangle_t rect;
 	uint32_t value;
 
+	if (!c)
+	{
+		eprintf("null client\n");
+		return;
+	}
+
 	eprintf("c=0x%x active=%d (c->window=0x%x)\n", c, active, c->window);
 
 	value =	active ? c->screen->black : c->screen->white;
@@ -63,13 +75,14 @@ void active(Client *c)
 {
 	Client *cc;
 
-	eprintf("c=0x%x (c->window=0x%x)\n", c, c->window);
-
-	if (c == 0)
+	if (!c)
 	{
-		fprintf(stderr, "9wm: active(c==0)\n");
+		eprintf("null client\n");
 		return;
 	}
+
+	eprintf("c=0x%x (c->window=0x%x)\n", c, c->window);
+
 	if (c == current)
 		return;
 	if (current)
@@ -99,7 +112,6 @@ void nofocus()
 	uint32_t values[2];
 	Client *c;
 
-	eprintf("\n");
 	if (current) {
 		setactive(current, 0);
 		for (c = current->revert; c; c = c->revert)
@@ -130,6 +142,12 @@ void top(Client *c)
 {
 	Client **l, *cc;
 
+	if (!c)
+	{
+		eprintf("null client\n");
+		return;
+	}
+
 	eprintf("c=0x%x (c->window=0x%x\n", c, c->window);
 
 	l = &clients;
@@ -152,6 +170,7 @@ Client * getclient(xcb_window_t w, int create)
 	Client *c;
 
 	eprintf("w=0x%x create=%d\n", w, create);
+
 	if (w == 0 || getscreen(w))
 		return 0;
 
@@ -187,6 +206,12 @@ void rmclient(Client *c)
 {
 	Client *cc;
 
+	if (!c)
+	{
+		eprintf("null client\n");
+		return;
+	}
+
 	eprintf("c=0x%x (c->window=0x%x)\n");
 
 	for (cc = current; cc && cc->revert; cc = cc->revert)
@@ -218,13 +243,23 @@ void rmclient(Client *c)
 			setactive(current, 1);
 		}
 	}
+	if (c->label)
+		xfree(c->label);
+	if (c->instance)
+		xfree(->instance);
+	if (c->class)
+		xfree(c->class);
+	if (c->name)
+		xfree(c->name);
+	if (c->iconname)
+		xfree(c->iconname)
 	if (c->ncmapwins != 0)
 	{
-		free((char *)c->cmapwins);
-		free((char *)c->wmcmaps);
+		xfree((char *)c->cmapwins);
+		xfree((char *)c->wmcmaps);
 	}
 	memset(c, 0, sizeof(Client));		/* paranoia */
-	free(c);
+	xfree(c);
 }
 
 #ifdef	DEBUG
