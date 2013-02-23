@@ -412,11 +412,16 @@ static int _getprop(xcb_window_t w, xcb_atom_t a, xcb_atom_t type, int32_t len, 
 			length = xcb_get_property_value_length(prop_r);
 			pp = xcb_get_property_value(prop_r);
 
-			*p = xmalloc((length + 1);
+			*p = (unsigned char **)malloc(length + 1);
+			if (!p)
+			{
+				fprintf(stderr, "Memory allocation error\n");
+				exit(EXIT_FAILURE);
+			}
 			memcpy(*p, pp, length);
-			(*p)[length[length] = '\0';
+			(*p)[length] = '\0';
 		}
-		xfree(prop_r);
+		free(prop_r);
 	}
 	else
 	{
@@ -451,7 +456,7 @@ void getcmaps(Client *c)
 			free(gatt_r);
 		}
 	}
-	n = _getprop(c->window, wm_colormaps, XCB_ATOM_WINDOW, 100L, (void **)&cw);
+	n = _getprop(c->window, wm_colormaps, XCB_ATOM_WINDOW, 100L, (unsigned char **)&cw);
 	if (c->ncmapwins != 0)
 	{
 		free(c->cmapwins);
@@ -544,7 +549,7 @@ char *getprop(xcb_window_t w, xcb_atom_t a)
 
 	eprintf("w=0x%x a=%d\n", w, a);
 
-	if (_getprop(w, a, XCB_ATOM_STRING, 100L, &p) <= 0)
+	if (_getprop(w, a, XCB_ATOM_STRING, 100L, (unsigned char **)&p) <= 0)
 		return 0;
 	return (char *)p;
 }
@@ -556,7 +561,7 @@ int get1prop(xcb_window_t w, xcb_atom_t a, xcb_atom_t type)
 
 	eprintf("w=0x%x a=%d type=%d\n", w, a, type);
 
-	if (_getprop(w, a, type, 1L, p) <= 0)
+	if (_getprop(w, a, type, 1L, (unsigned char **)p) <= 0)
 		return 0;
 	memcpy(&x, *p, sizeof(int));
 
@@ -604,7 +609,7 @@ int get_state(xcb_window_t w, int *state)
 	if (!w)
 		return;
 
-	if (_getprop(w, wm_state, wm_state, 2L, &p) <= 0)
+	if (_getprop(w, wm_state, wm_state, 2L, (unsigned char **)&p) <= 0)
 		return 0;
 
 	memcpy(state, p, sizeof(int));
@@ -626,8 +631,7 @@ void getproto(Client *c)
 
 	w = c->window;
 	c->proto = 0;
-	if ((n = _getprop(w, wm_protocols, XCB_ATOM_ATOM,
-				20L, &p)) <= 0)
+	if ((n = _getprop(w, wm_protocols, XCB_ATOM_ATOM, 20L, (unsigned char **)&p)) <= 0)
 		return;
 
 	for (i = 0, t = p; i < n; i++)
