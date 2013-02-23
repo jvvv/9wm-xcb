@@ -401,56 +401,29 @@ static int _getprop(xcb_window_t w, xcb_atom_t a, xcb_atom_t type, int32_t len, 
 
 	prop_c = xcb_get_property(dpy, 0, w, a, type, 0, len);
 	prop_r = xcb_get_property_reply(dpy, prop_c, &errp);
-	if (!prop_r)
+
+	if (prop_r)
 	{
-		handler(&err);
-		return 1;
-	}
+		length = xcb_get_property_value_length(prop_r);
+		if (prop_r->type != XCB_NONE && length)
+		{
+			void *pp;
 
-	if (prop_r->type != XCB_NONE)
+			length = xcb_get_property_value_length(prop_r);
+			pp = xcb_get_property_value(prop_r);
+
+			*p = xmalloc((length + 1);
+			memcpy(*p, pp, length);
+			(*p)[length[length] = '\0';
+		}
+		xfree(prop_r);
+	}
+	else
 	{
-		long nbytes, netbytes, len;
-		void *pp;
-
-		len = xcb_get_property_value_length(prop_r);
-		pp = xcb_get_property_value(prop_r);
-
-		switch (prop_r->format)
-		{
-			case 8:
-				nbytes = netbytes = len;
-				break;
-			case 16:
-				nbytes = len * sizeof(short);
-				netbytes = len << 1;
-				break;
-			case 32:
-				nbytes = len * sizeof(long);
-				netbytes = len << 2;
-				break;
-			default:
-				err.response_type = 0;
-				err.error_code = XCB_IMPLEMENTATION;
-				err.major_code = XCB_GET_PROPERTY;
-				err.minor_code = 0;
-				handler(&err);
-				return 1;
-				
-		}
-
-		if (nbytes + 1 > 0)
-		{
-			*p = xmalloc((unsigned)nbytes + 1);
-			memcpy(*p, pp, netbytes);
-			(*p)[nbytes] = '\0';
-		}
+		if (errp)
+			handler(errp);
+		return 0;
 	}
-
-	if (prop_r->length == 0 && *p)
-		xfree(*p);
-
-	length = prop_r->length;
-	xfree(prop_r);
 
 	return length;
 }
