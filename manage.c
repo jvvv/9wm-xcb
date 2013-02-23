@@ -36,8 +36,8 @@ int manage(Client *c, int mapped)
 	prop_c = xcb_icccm_get_wm_class_unchecked(dpy, c->window);
 	if (xcb_icccm_get_wm_class_reply(dpy, prop_c, &cl_hint, NULL))
 	{
-		c->instance = cl_hint.instance_name;
-		c->class = cl_hint.class_name;
+		c->instance = strdup(cl_hint.instance_name);
+		c->class = strdup(cl_hint.class_name);
 		c->is9term = (strcmp(c->class, "9term") == 0);
 		xcb_icccm_get_wm_class_reply_wipe(&cl_hint);
 	}
