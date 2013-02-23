@@ -248,8 +248,6 @@ void rmclient(Client *c)
 			setactive(current, 1);
 		}
 	}
-	if (c->label)
-		free(c->label);
 	if (c->instance)
 		free(c->instance);
 	if (c->class)
