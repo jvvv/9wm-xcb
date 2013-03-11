@@ -46,7 +46,7 @@ xcb_atom_t		wm_colormaps;
 xcb_atom_t		_9wm_running;
 xcb_atom_t		_9wm_hold_mode;
 
-char	*fontlist[] = {
+char *fontlist[] = {
 	"lucm.latin1.9",
 	"blit",
 	"9x15bold",
@@ -55,6 +55,17 @@ char	*fontlist[] = {
 	"*",
 	NULL,
 };
+
+void *xalloc(size_t sz)
+{
+	void *p = calloc(1, sz ? sz : 1);
+	if (p)
+	{
+		fprintf(stderr, "Failed to allocate %d bytes\n", sz);
+		exit(EXIT_FAILURE);
+	}
+	return p;
+}
 
 void usage()
 {
@@ -163,24 +174,24 @@ int main(int argc, char *argv[])
 	_9wm_running = xinternatom(dpy, "_9WM_RUNNING", 0);
 	_9wm_hold_mode = xinternatom(dpy, "_9WM_HOLD_MODE", 0);
 
-	if (fname != NULL)
-		if ((font_info = xloadqueryfont(dpy, fname, &font)) == NULL)
+	if (fname)
+		if (!(font_info = xloadqueryfont(dpy, fname, &font)))
 			fprintf(stderr, "9wm: warning: can't load font %s\n", fname);
 
-	if (font_info == NULL)
+	if (!font_info)
 	{
-		for (i = 0, fname = fontlist[i]; fname != NULL; i++, fname = fontlist[i])
+		for (i =  0; ; i++)
 		{
-			fname = fontlist[i++];
-			if (fname == NULL)
+			if (!fontlist[i] || !*fontlist[i])
 			{
-				fprintf(stderr, "9wm: warning: can't find a font\n");
+				fprintf(stderr, "9wm: warning: can't find a font\n")
 				break;
 			}
-			if ((font_info = xloadqueryfont(dpy, fname, &font)) != NULL)
+			if (font_info = xloadqueryfont(dpy, fontlist[i], &font))
 				break;
 		}
 	}
+
 	if (nostalgia)
 	{
 		_border--;
@@ -209,12 +220,7 @@ int main(int argc, char *argv[])
 #endif
 
 	num_screens = xcb_setup_roots_length(xcb_get_setup(dpy));
-	screens = (ScreenInfo *)malloc(sizeof(ScreenInfo) * num_screens);
-	if (!screens)
-	{
-		fprintf(stderr, "9wm: memory allocation error\n");
-		exit(-1);
-	}
+	screens = (ScreenInfo *)xalloc(sizeof(ScreenInfo) * num_screens);
 
 	for (i = 0; i < num_screens; i++)
 		initscreen(&screens[i], i, background);
@@ -275,7 +281,7 @@ void initscreen(ScreenInfo *s, int i, int background)
 	gv.subwindow_mode = XCB_SUBWINDOW_MODE_INCLUDE_INFERIORS;
 	mask = XCB_GC_FUNCTION | XCB_GC_FOREGROUND | XCB_GC_BACKGROUND |
                    XCB_GC_LINE_WIDTH | XCB_GC_SUBWINDOW_MODE;
-	if (font_info != NULL && font != 0)
+	if (font_info && font)
 	{
 		gv.font = font;
 		mask |= XCB_GC_FONT;
@@ -362,16 +368,12 @@ void sendcmessage(xcb_window_t w, xcb_atom_t a, long x, int isroot)
 
 void sendconfig(Client *c)
 {
-	xcb_configure_notify_event_t *ce;
+	xcb_configure_notify_event_t ce;
 
+	if (!c)
+		return;
+		
 	eprintf("c=0x%x (c->window=0x%x)\n", c, c->window);
-
-	ce = (xcb_configure_notify_event_t *)calloc(32, 1);
-	if (!ce)
-	{
-		fprintf(stderr, "Memeory allocation error\n");
-		exit(EXIT_FAILURE);
-	}
 
 	ce->response_type = XCB_CONFIGURE_NOTIFY;
 	ce->event = c->window;
@@ -384,7 +386,7 @@ void sendconfig(Client *c)
 	ce->above_sibling = XCB_NONE;
 	ce->override_redirect = 0;
 	xcb_send_event(dpy, 0, c->window,
-		XCB_EVENT_MASK_STRUCTURE_NOTIFY, (const char*)ce);
+		XCB_EVENT_MASK_STRUCTURE_NOTIFY, (const char*)&ce);
 }
 
 void sighandler(int signum)
