@@ -100,10 +100,11 @@ static void setmouse(int x, int y, ScreenInfo *s)
 int menuhit(xcb_button_press_event_t *e, Menu *m)
 {
 	xcb_generic_event_t *ev;
-	int i, n, cur, old, wide, high, status, drawn, warp;
+	int i, j, len, n, cur, old, wide, high, status, drawn, warp;
 	int x, y, dx, dy, xmax, ymax;
 	int tx, ty;
 	ScreenInfo *s;
+	TextItem **text_items;
 	xcb_screen_t *scr;
 	xcb_rectangle_t rect;
 	xcb_params_configure_window_t wc;
@@ -130,6 +131,16 @@ int menuhit(xcb_button_press_event_t *e, Menu *m)
 	cur = m->lasthit;
 	if (cur >= n)
 		cur = n - 1;
+
+	text_items = (TextItem **)xalloc(n * sizeof(TextItem *));
+	for (i = 0; i < n; i++)
+	{
+		len = strlen(m->item[i]);
+		text_items[i] = (TextItem *)xalloc(len + sizeof(TextItem))
+		for (j = 0; j < len; j++)
+			text_items[i]->text[j] = m->item[i][j];
+		text_item[i]->nchars = len;
+	}
 
 	high = font_info->font_ascent + font_info->font_descent + 1;
 	dy = n * high;
@@ -174,6 +185,9 @@ int menuhit(xcb_button_press_event_t *e, Menu *m)
 	{
 		graberror("menuhit", status);
 		xcb_unmap_window(dpy, s->menuwin);
+		for (i = 0; i < n; i++)
+			free(text_items[i]);
+		free(text_items);
 		return -1;
 	}
 	drawn = 0;
@@ -206,6 +220,9 @@ int menuhit(xcb_button_press_event_t *e, Menu *m)
 			xcb_unmap_window(dpy, s->menuwin);
 			xcb_flush(dpy);
 			free(ev);
+			for (i = 0; i < n; i++)
+				free(text_items[i]);
+			free(text_items);
 			return i;
 		case XCB_MOTION_NOTIFY:
 			if (!drawn)
@@ -246,7 +263,8 @@ int menuhit(xcb_button_press_event_t *e, Menu *m)
 				
 				tx = (wide - textwidth(dpy, font, strlen(m->item[i]), m->item[i]))/2;
 				ty = i * high + font_info->font_ascent + 1;
-				xcb_image_text_8(dpy, strlen(m->item[i]), s->menuwin, s->gc1, tx, ty, m->item[i]);
+//				xcb_image_text_8(dpy, strlen(m->item[i]), s->menuwin, s->gc1, tx, ty, m->item[i]);
+				xcb_poly_text_8(dpy, s->menuwin, s->gc0, tx, ty, (const uint8_t *)text_items[i])
 			}
 			if (cur >= 0 && cur < n)
 			{
