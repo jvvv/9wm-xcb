@@ -59,7 +59,7 @@ char *fontlist[] = {
 void *xalloc(size_t sz)
 {
 	void *p = calloc(1, sz ? sz : 1);
-	if (p)
+	if (!p)
 	{
 		fprintf(stderr, "Failed to allocate %d bytes\n", sz);
 		exit(EXIT_FAILURE);
