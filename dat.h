@@ -96,8 +96,7 @@ struct ScreenInfo {
 	xcb_window_t	root;
 	xcb_window_t	menuwin;
 	xcb_colormap_t	def_cmap;
-	xcb_gcontext_t	gc0;
-	xcb_gcontext_t	gc1;
+	xcb_gcontext_t	gc;
 	uint32_t	black;
 	uint32_t	white;
 	int		min_cmaps;
