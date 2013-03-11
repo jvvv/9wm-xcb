@@ -41,16 +41,14 @@ void button(xcb_button_press_event_t *e)
 	uint32_t values[2];
 
 	curtime = e->time;
-	s = getscreen(e->root);
-	if (s == 0)
+	if (!(s = getscreen(e->root));
 	{
 		fprintf(stderr, "button: getscreen failed\n");
 		fprintf(stderr, " e->root=%d e->event=%d e->child=%d e->detail=%d\n",
 				e->root, e->event, e->child, e->detail);
 		return;
 	}
-	c = getclient(e->event, 0);
-	if (c)
+	if (c = getclient(e->event, 0))
 	{
 		e->event_x += c->x - BORDER + 1;
 		e->event_y += c->y - BORDER + 1;
@@ -76,6 +74,7 @@ void button(xcb_button_press_event_t *e)
 						e->event, e->root, e->child);
 		}
 	}
+
 	switch (e->detail)
 	{
 		case XCB_BUTTON_INDEX_1:
