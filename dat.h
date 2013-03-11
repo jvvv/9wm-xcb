@@ -38,6 +38,7 @@
 typedef struct Client Client;
 typedef struct Menu Menu;
 typedef struct ScreenInfo ScreenInfo;
+typedef struct TextItem TextItem;
 
 struct Client {
 	xcb_window_t		window;
@@ -106,6 +107,13 @@ struct ScreenInfo {
 	xcb_cursor_t	arrow;
 	xcb_pixmap_t	root_pixmap;
 	char		display[256];	/* arbitrary limit */
+};
+
+struct TextItem
+{
+	uint8_t nchars;
+	int8_t delta;
+	uint8_t text[];
 };
 
 /* main.c */
