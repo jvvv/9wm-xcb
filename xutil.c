@@ -56,10 +56,10 @@ xcb_query_font_reply_t *xloadqueryfont (xcb_connection_t *c, char *fname, xcb_fo
 		xcb_close_font(c, font);
 		if(errorp)
 			handler(errorp);
+		return NULL;
 	}
-	else
-		*ret = font;
 
+	*ret = font;
 	return qf_r;
 }
 
