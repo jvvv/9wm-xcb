@@ -68,6 +68,7 @@ void xselectinput(xcb_connection_t *c, xcb_window_t w, uint32_t mask)
 	eprintf("w=0x%x mask=%d\n", w, mask);
 	xcb_change_window_attributes(c, w, XCB_CW_EVENT_MASK, &mask);
 }
+
 void xmovewindow(xcb_connection_t *c, xcb_window_t w, int x, int y)
 {
 	xcb_params_configure_window_t wc;
