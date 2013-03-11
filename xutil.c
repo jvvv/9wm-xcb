@@ -123,21 +123,17 @@ xcb_window_t xcreatesimplewindow(xcb_connection_t *c, xcb_window_t parent, uint3
 
 uint32_t textwidth(xcb_connection_t *c, xcb_font_t font, int len, char *str)
 {
-	xcb_query_text_extents_cookie_t cookie;
-	xcb_query_text_extents_reply_t *reply;
-	xcb_query_font_cookie_t qfcookie;
-	xcb_query_font_reply_t *qfreply;
+	xcb_query_text_extents_cookie_t qte_c;
+	xcb_query_text_extents_reply_t *qte_r;
+	xcb_query_font_cookie_t qf_c;
+	xcb_query_font_reply_t *qf_r;
+	xcb_generic_error_t *errorp;
 	int i;
 	uint32_t width;
 	xcb_char2b_t *wstr;
 
 	eprintf("font=0x%x len=%d str=%s\n", font, len, str);
-	wstr = (xcb_char2b_t *)malloc(len * sizeof(xcb_char2b_t));
-	if (!wstr)
-	{
-		fprintf(stderr, "9wm: xtextwidth: failed to allocate wstr\n");
-		exit(EXIT_FAILURE);
-	}
+	wstr = (xcb_char2b_t *)xalloc(len * sizeof(xcb_char2b_t));
 
 	for (i = 0; i < len; i++)
 	{
@@ -145,27 +141,29 @@ uint32_t textwidth(xcb_connection_t *c, xcb_font_t font, int len, char *str)
 		wstr[i].byte2 = str[i];
 	}
 
-	cookie = xcb_query_text_extents_unchecked(c, font, len, wstr);
-	reply = xcb_query_text_extents_reply(c, cookie, NULL);
-	if (reply)
+	qte_c = xcb_query_text_extents(c, font, len, wstr);
+	qte_r = xcb_query_text_extents_reply(c, qte_c, &errorp);
+	if (qte_r)
 	{
-		width = reply->overall_width + 4;
-		free(reply);
+		width = qte_r->overall_width;
+		free(qte_r);
 	}
 	else
 	{
 		fprintf(stderr, "9wm: xtextwidth: failed to get text extents\n");
+		handler(errorp);
 
-		qfcookie = xcb_query_font(c, font);
-		qfreply = xcb_query_font_reply(c, qfcookie, NULL);
-		if (!qfreply)
+		qf_c = xcb_query_font(c, font);
+		qf_r = xcb_query_font_reply(c, qf_c, NULL);
+		if (!qf_r)
 		{
 			fprintf(stderr, "9wm: xtextwidth: query font failed\n");
+			handler(&errorp);
 			return 0;
 		}
 
-		width = (len * qfreply->max_bounds.character_width) + 4;
-		free(qfreply);
+		width = len * qf_r->max_bounds.character_width;
+		free(qf_r);
 	}
 
 	free(wstr);
