@@ -41,7 +41,7 @@ static int grab(xcb_window_t w, xcb_window_t constrain, int mask, xcb_cursor_t c
 	}
 	else if(errorp)
 	{
-		status = errp->error_code;
+		status = errorp->error_code;
 	}
 
 	return status;
@@ -54,7 +54,7 @@ static void ungrab(xcb_button_press_event_t *e)
 	xcb_generic_error_t *err;
 	
 	eprintf("e=0x%x\n", e);
-	if (!nobuttons(bpev))
+	if (!nobuttons(bpe))
 	{
 		for (;;)
 		{
@@ -67,7 +67,7 @@ static void ungrab(xcb_button_press_event_t *e)
 		}
 	}
 	xcb_ungrab_pointer(dpy, bpe->time);
-	curtime = bpev->time;
+	curtime = bpe->time;
 	free(ev);
 }
 
@@ -86,9 +86,9 @@ static void getmouse(int *x, int *y, ScreenInfo *s)
 		return;
 	}
 
-	*x = reply->root_x;
-	*y = reply->root_y;
-	free(reply);
+	*x = qp_r->root_x;
+	*y = qp_r->root_y;
+	free(qp_r);
 }
 
 static void setmouse(int x, int y, ScreenInfo *s)
