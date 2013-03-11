@@ -67,7 +67,7 @@ void draw_border(Client *c, int active)
 		rect.y = INSET;
 		rect.width = c->dx + BORDER - INSET;
 		rect.height = c->dy + BORDER - INSET;
-		xcb_poly_rectangle(dpy, c->parent, c->screen->gc0, 1, &rect);
+		xcb_poly_rectangle(dpy, c->parent, c->screen->gc, 1, &rect);
 	}
 }
 
