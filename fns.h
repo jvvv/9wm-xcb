@@ -13,6 +13,7 @@
 
 
 /* main.c */
+extern void *xalloc(size_t sz);
 extern void initscreen(ScreenInfo *s, int i, int background);
 extern ScreenInfo *getscreen(xcb_window_t w);
 extern xcb_timestamp_t timestamp(void);
