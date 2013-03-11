@@ -21,9 +21,9 @@ static int nobuttons(xcb_button_press_event_t *e)	/* Einstuerzende */
 static int grab(xcb_window_t w, xcb_window_t constrain, int mask, xcb_cursor_t curs, int t)
 {
 	int status = -1;
-	xcb_grab_pointer_cookie_t cookie;
-	xcb_grab_pointer_reply_t *reply;
-	xcb_generic_error_t *errp;
+	xcb_grab_pointer_cookie_t gp_c;
+	xcb_grab_pointer_reply_t *gp_r;
+	xcb_generic_error_t *errorp;
 
 	eprintf("w=0x%x constrain=0x%x mask=%d curs=%d t=%d\n", w, constrain, mask, curs, t);
 
