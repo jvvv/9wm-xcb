@@ -443,14 +443,14 @@ void reparent(xcb_reparent_notify_event_t *e)
 		{
 			gg_c = xcb_get_geometry(dpy, c->window);
 			gg_r = xcb_get_geometry_reply(dpy, gg_c, &errorp);
-			if (reply)
+			if (gg_r)
 			{
-				c->x = reply->x;
-				c->y = reply->y;
-				c->dx = reply->width;
-				c->dy = reply->height;
-				c->border = reply->border_width;
-				free(reply);
+				c->x = gg_r->x;
+				c->y = gg_r->y;
+				c->dx = gg_r->width;
+				c->dy = gg_r->height;
+				c->border = gg_r->border_width;
+				free(gg_r);
 			}
 			else
 			{
