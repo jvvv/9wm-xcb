@@ -30,26 +30,14 @@ int evq_qlen(void)
 void evq_init(void)
 {
 	eprintf("\n");
-	evq_head = (struct evqnode *)malloc(sizeof(struct evqnode));
-	if (evq_head == NULL)
-	{
-		fprintf(stderr, "evq_init: failed to allocate head node\n");
-		exit(EXIT_FAILURE);
-	}
-	evq_tail = (struct evqnode *)malloc(sizeof(struct evqnode));
-	if (evq_tail == NULL)
-	{
-		fprintf(stderr, "evq_init: failed to allocate tail node\n");
-		exit(EXIT_FAILURE);
-	}
+	evq_head = (struct evqnode *)xalloc(sizeof(struct evqnode));
+	evq_tail = (struct evqnode *)xalloc(sizeof(struct evqnode));
 	evq_head->event = NULL;
 	evq_tail->event = NULL;
-
 	evq_head->prev = evq_head;
 	evq_head->next = evq_tail;
 	evq_tail->prev = evq_head;
 	evq_tail->next = evq_tail;
-
 	evq_len = 0;
 }
 
@@ -84,13 +72,7 @@ static void evq_enq(xcb_generic_event_t *ev)
 	struct evqnode *n, *p;
 
 	eprintf("ev=0x%x (ev->response_type=%d evq_len=%d at fn start) ", ev, ev->response_type, evq_len);
-	n = (struct evqnode *)malloc(sizeof(struct evqnode));
-	if (n == NULL)
-	{
-		fprintf(stderr, "evq_enq: failed to allocate node\n");
-		exit(EXIT_FAILURE);
-	}
-
+	n = (struct evqnode *)xalloc(sizeof(struct evqnode));
 	n->event = ev;
 	p = evq_tail->prev;
 	p->next = n;
