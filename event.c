@@ -427,8 +427,9 @@ void property(xcb_property_notify_event_t *e)
 void reparent(xcb_reparent_notify_event_t *e)
 {
 	Client *c;
-	xcb_get_geometry_cookie_t cookie;
-	xcb_get_geometry_reply_t *reply;
+	xcb_get_geometry_cookie_t gg_c;
+	xcb_get_geometry_reply_t *gg_r;
+	xcb_generic_error_t *errorp;
 	ScreenInfo *s;
 
 	eprintf("e=0x%x\n", e);
@@ -440,8 +441,8 @@ void reparent(xcb_reparent_notify_event_t *e)
 		c = getclient(e->window, 1);
 		if ((c != 0) && (c->dx == 0 || c->dy == 0))
 		{
-			cookie = xcb_get_geometry_unchecked(dpy, c->window);
-			reply = xcb_get_geometry_reply(dpy, cookie, NULL);
+			gg_c = xcb_get_geometry(dpy, c->window);
+			gg_r = xcb_get_geometry_reply(dpy, gg_c, &errorp);
 			if (reply)
 			{
 				c->x = reply->x;
@@ -454,6 +455,8 @@ void reparent(xcb_reparent_notify_event_t *e)
 			else
 			{
 				fprintf(stderr, "reparent: get geometry failed\n");
+				if (errorp)
+					handler(errorp);
 			}
 			c->screen = s;
 			if (c->parent == XCB_NONE)
