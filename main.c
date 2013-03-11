@@ -286,14 +286,9 @@ void initscreen(ScreenInfo *s, int i, int background)
 		gv.font = font;
 		mask |= XCB_GC_FONT;
 	}
-	s->gc0 = xcb_generate_id(dpy);
-	xcb_aux_create_gc(dpy, s->gc0, s->root, mask, &gv);
+	s->gc = xcb_generate_id(dpy);
+	xcb_aux_create_gc(dpy, s->gc, s->root, mask, &gv);
 
-	gv.function = XCB_GX_AND_INVERTED;
-	gv.foreground = s->black;
-	s->gc1 = xcb_generate_id(dpy);
-	xcb_aux_create_gc(dpy, s->gc1, s->root, mask, &gv);
-	
 	initcurs(s);
 
 	attr.cursor = s->arrow;
