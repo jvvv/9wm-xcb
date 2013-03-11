@@ -220,8 +220,8 @@ int menuhit(xcb_button_press_event_t *e, Menu *m)
 			xcb_unmap_window(dpy, s->menuwin);
 			xcb_flush(dpy);
 			free(ev);
-			for (i = 0; i < n; i++)
-				free(text_items[i]);
+			for (j = 0; j < n; j++)
+				free(text_items[j]);
 			free(text_items);
 			return i;
 		case XCB_MOTION_NOTIFY:
@@ -247,12 +247,12 @@ int menuhit(xcb_button_press_event_t *e, Menu *m)
 			if ((old >= 0) && (old < n))
 			{
 				rect.y = old * high;
-				xcb_poly_fill_rectangle(dpy, s->menuwin, s->gc0, 1, &rect);
+				xcb_poly_fill_rectangle(dpy, s->menuwin, s->gc, 1, &rect);
 			}
 			if ((cur >= 0) && (cur < n))
 			{
 				rect.y = cur * high;
-				xcb_poly_fill_rectangle(dpy, s->menuwin, s->gc0, 1, &rect);
+				xcb_poly_fill_rectangle(dpy, s->menuwin, s->gc, 1, &rect);
 			}
 			xcb_flush(dpy);
 			break;
@@ -263,8 +263,7 @@ int menuhit(xcb_button_press_event_t *e, Menu *m)
 				
 				tx = (wide - textwidth(dpy, font, strlen(m->item[i]), m->item[i]))/2;
 				ty = i * high + font_info->font_ascent + 1;
-//				xcb_image_text_8(dpy, strlen(m->item[i]), s->menuwin, s->gc1, tx, ty, m->item[i]);
-				xcb_poly_text_8(dpy, s->menuwin, s->gc0, tx, ty,
+				xcb_poly_text_8(dpy, s->menuwin, s->gc, tx, ty,
 						text_items[i]->nchars + 2, (const uint8_t *)text_items[i]);
 			}
 			if (cur >= 0 && cur < n)
@@ -273,7 +272,7 @@ int menuhit(xcb_button_press_event_t *e, Menu *m)
 				rect.y = cur * high;
 				rect.width = wide;
 				rect.height = high;
-				xcb_poly_fill_rectangle(dpy, s->menuwin, s->gc0, 1, &rect);
+				xcb_poly_fill_rectangle(dpy, s->menuwin, s->gc, 1, &rect);
 			}
 			drawn = 1;
 			xcb_flush(dpy);
@@ -432,7 +431,7 @@ static void drawbound(Client *c)
 	rects[1].width = dx - 3;
 	rects[1].height = dy - 3;
 
-	xcb_poly_rectangle(dpy,s->root, s->gc0, 2, rects);
+	xcb_poly_rectangle(dpy,s->root, s->gc, 2, rects);
 }
 
 static void misleep(int msec)
