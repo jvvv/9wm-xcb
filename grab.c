@@ -139,7 +139,7 @@ int menuhit(xcb_button_press_event_t *e, Menu *m)
 		text_items[i] = (TextItem *)xalloc(len + sizeof(TextItem))
 		for (j = 0; j < len; j++)
 			text_items[i]->text[j] = m->item[i][j];
-		text_item[i]->nchars = len;
+		text_items[i]->nchars = len;
 	}
 
 	high = font_info->font_ascent + font_info->font_descent + 1;
@@ -264,7 +264,8 @@ int menuhit(xcb_button_press_event_t *e, Menu *m)
 				tx = (wide - textwidth(dpy, font, strlen(m->item[i]), m->item[i]))/2;
 				ty = i * high + font_info->font_ascent + 1;
 //				xcb_image_text_8(dpy, strlen(m->item[i]), s->menuwin, s->gc1, tx, ty, m->item[i]);
-				xcb_poly_text_8(dpy, s->menuwin, s->gc0, tx, ty, (const uint8_t *)text_items[i])
+				xcb_poly_text_8(dpy, s->menuwin, s->gc0, tx, ty,
+						text_items[i]->nchars + 2, (const uint8_t *)text_items[i]);
 			}
 			if (cur >= 0 && cur < n)
 			{
