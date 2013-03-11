@@ -375,16 +375,16 @@ void sendconfig(Client *c)
 		
 	eprintf("c=0x%x (c->window=0x%x)\n", c, c->window);
 
-	ce->response_type = XCB_CONFIGURE_NOTIFY;
-	ce->event = c->window;
-	ce->window = c->window;
-	ce->x = c->x;
-	ce->y = c->y;
-	ce->width = c->dx;
-	ce->height = c->dy;
-	ce->border_width = c->border;
-	ce->above_sibling = XCB_NONE;
-	ce->override_redirect = 0;
+	ce.response_type = XCB_CONFIGURE_NOTIFY;
+	ce.event = c->window;
+	ce.window = c->window;
+	ce.x = c->x;
+	ce.y = c->y;
+	ce.width = c->dx;
+	ce.height = c->dy;
+	ce.border_width = c->border;
+	ce.above_sibling = XCB_NONE;
+	ce.override_redirect = 0;
 	xcb_send_event(dpy, 0, c->window,
 		XCB_EVENT_MASK_STRUCTURE_NOTIFY, (const char*)&ce);
 }
