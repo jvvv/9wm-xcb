@@ -167,7 +167,7 @@ void top(Client *c)
 
 Client * getclient(xcb_window_t w, int create)
 {
-	Client *c;
+	Client *c = NULL;
 
 	eprintf("w=0x%x create=%d\n", w, create);
 
@@ -178,32 +178,16 @@ Client * getclient(xcb_window_t w, int create)
 		if (c->window == w || c->parent == w)
 			return c;
 
-	if (!create)
-		return 0;
-
-	c = (Client *)malloc(sizeof(Client));
-	if (!c)
+	if (create)
 	{
-		fprintf(stderr, "Memory allocation error\n");
-		exit(EXIT_FAILURE);
+		c = (Client *)xalloc(sizeof(Client));
+		c->window = w;
+		/* c->parent will be set by the caller */
+		c->state = XCB_ICCCM_WM_STATE_WITHDRAWN;
+		c->next = clients;
+		clients = c;
 	}
-	memset(c, 0, sizeof(Client));
-	c->window = w;
-	/* c->parent will be set by the caller */
-	c->parent = XCB_NONE;
-	c->reparenting = 0;
-	c->state = XCB_ICCCM_WM_STATE_WITHDRAWN;
-	c->init = 0;
-	c->cmap = XCB_NONE;
-	c->label = c->class = 0;
-	c->revert = 0;
-	c->is9term = 0;
-	c->hold = 0;
-	c->ncmapwins = 0;
-	c->cmapwins = 0;
-	c->wmcmaps = 0;
-	c->next = clients;
-	clients = c;
+	
 	return c;
 }
 
