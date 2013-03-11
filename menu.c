@@ -41,7 +41,7 @@ void button(xcb_button_press_event_t *e)
 	uint32_t values[2];
 
 	curtime = e->time;
-	if (!(s = getscreen(e->root));
+	if (!(s = getscreen(e->root)))
 	{
 		fprintf(stderr, "button: getscreen failed\n");
 		fprintf(stderr, " e->root=%d e->event=%d e->child=%d e->detail=%d\n",
