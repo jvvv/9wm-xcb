@@ -412,12 +412,7 @@ static int _getprop(xcb_window_t w, xcb_atom_t a, xcb_atom_t type, int32_t len, 
 			length = xcb_get_property_value_length(prop_r);
 			pp = xcb_get_property_value(prop_r);
 
-			*p = (unsigned char *)malloc(length + 1);
-			if (!p)
-			{
-				fprintf(stderr, "Memory allocation error\n");
-				exit(EXIT_FAILURE);
-			}
+			*p = (unsigned char *)xalloc(length + 1);
 			memcpy(*p, pp, length);
 			(*p)[length] = '\0';
 		}
