@@ -15,41 +15,52 @@ xcb_atom_t xinternatom(xcb_connection_t *c, char *name, uint8_t only_if_exists)
 	xcb_atom_t atom;
 	xcb_intern_atom_cookie_t cookie;
 	xcb_intern_atom_reply_t *reply;
+	xcb_generic_error_t *errorp;
 
 	eprintf("name=%s only_if_exists=%d\n", name, only_if_exists);
 	cookie = xcb_intern_atom(c, only_if_exists, strlen(name), name);
-	reply = xcb_intern_atom_reply(c, cookie, NULL);
+	reply = xcb_intern_atom_reply(c, cookie, &errorp);
 	if (reply)
 	{
 		return reply->atom;
 		free(reply);
 	}
+	else if (errorp)
+		handler(errorp);
+
 	return 0;
 }
 
 xcb_query_font_reply_t *xloadqueryfont (xcb_connection_t *c, char *fname, xcb_font_t *ret)
 {
 	xcb_void_cookie_t cookie;
-	xcb_generic_error_t *error;
-	xcb_query_font_cookie_t qfcookie;
-	xcb_query_font_reply_t *qfreply;
+	xcb_generic_error_t *errorp;
+	xcb_query_font_cookie_t qf_c;
+	xcb_query_font_reply_t *qf_r;
 	xcb_font_t font;
 
 	eprintf("fname=%s ret=0x%x\n", fname, ret);
 	font = xcb_generate_id(c);
 	cookie = xcb_open_font_checked(c, font, strlen(fname), fname);
-	error = xcb_request_check(c, cookie);
-	if (error)
+	errorp = xcb_request_check(c, cookie);
+	if (errorp)
+	{
+		handler(errorp);
 		return NULL;
+	}
 
-	qfcookie = xcb_query_font(c, font);
-	qfreply = xcb_query_font_reply(c, qfcookie, NULL);
+	qf_c = xcb_query_font(c, font);
+	qf_r = xcb_query_font_reply(c, qf_c, &errorp);
 	if (!qfreply)
+	{
 		xcb_close_font(c, font);
+		if(errorp)
+			handler(errorp);
+	}
 	else
 		*ret = font;
 
-	return qfreply;
+	return qf_r;
 }
 
 void xselectinput(xcb_connection_t *c, xcb_window_t w, uint32_t mask)
@@ -151,14 +162,16 @@ uint32_t textwidth(xcb_connection_t *c, xcb_font_t font, int len, char *str)
 	else
 	{
 		fprintf(stderr, "9wm: xtextwidth: failed to get text extents\n");
-		handler(errorp);
+		if (errorp)
+			handler(errorp);
 
 		qf_c = xcb_query_font(c, font);
 		qf_r = xcb_query_font_reply(c, qf_c, NULL);
 		if (!qf_r)
 		{
 			fprintf(stderr, "9wm: xtextwidth: query font failed\n");
-			handler(&errorp);
+			if (errorp)
+				handler(errorp);
 			return 0;
 		}
 
