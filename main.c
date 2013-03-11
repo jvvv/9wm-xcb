@@ -184,7 +184,7 @@ int main(int argc, char *argv[])
 		{
 			if (!fontlist[i] || !*fontlist[i])
 			{
-				fprintf(stderr, "9wm: warning: can't find a font\n")
+				fprintf(stderr, "9wm: warning: can't find a font\n");
 				break;
 			}
 			if (font_info = xloadqueryfont(dpy, fontlist[i], &font))
