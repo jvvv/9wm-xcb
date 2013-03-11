@@ -44,18 +44,13 @@ xcb_query_font_reply_t *xloadqueryfont (xcb_connection_t *c, char *fname, xcb_fo
 	cookie = xcb_open_font_checked(c, font, strlen(fname), fname);
 	errorp = xcb_request_check(c, cookie);
 	if (errorp)
-	{
-		handler(errorp);
 		return NULL;
-	}
 
 	qf_c = xcb_query_font(c, font);
 	qf_r = xcb_query_font_reply(c, qf_c, &errorp);
 	if (!qf_r)
 	{
 		xcb_close_font(c, font);
-		if(errorp)
-			handler(errorp);
 		return NULL;
 	}
 
