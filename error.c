@@ -28,8 +28,7 @@ void handler(xcb_generic_error_t *e)
 		exit(1);
 	}
 
-	if (ignore_badwindow && (e->error_code == XCB_WINDOW
-				|| e->error_code == XCB_COLORMAP))
+	if (ignore_badwindow && (e->error_code == XCB_WINDOW || e->error_code == XCB_COLORMAP))
 		return;
 
 	fprintf(stderr, "9wm: request=%s (major %d, minor %d),",
