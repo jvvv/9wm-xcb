@@ -51,7 +51,7 @@ xcb_query_font_reply_t *xloadqueryfont (xcb_connection_t *c, char *fname, xcb_fo
 
 	qf_c = xcb_query_font(c, font);
 	qf_r = xcb_query_font_reply(c, qf_c, &errorp);
-	if (!qfreply)
+	if (!qf_r)
 	{
 		xcb_close_font(c, font);
 		if(errorp)
