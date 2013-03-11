@@ -20,26 +20,26 @@ static int nobuttons(xcb_button_press_event_t *e)	/* Einstuerzende */
 
 static int grab(xcb_window_t w, xcb_window_t constrain, int mask, xcb_cursor_t curs, int t)
 {
-	int status;
+	int status = -1;
 	xcb_grab_pointer_cookie_t cookie;
 	xcb_grab_pointer_reply_t *reply;
 	xcb_generic_error_t *errp;
 
 	eprintf("w=0x%x constrain=0x%x mask=%d curs=%d t=%d\n", w, constrain, mask, curs, t);
 
-	if (t == 0)
+	if (!t)
 		t = timestamp();
 
-	cookie = xcb_grab_pointer(dpy, 0, w, mask,
+	gp_c = xcb_grab_pointer(dpy, 0, w, mask,
 		XCB_GRAB_MODE_ASYNC, XCB_GRAB_MODE_ASYNC,
 		constrain, curs, t);
-	reply = xcb_grab_pointer_reply(dpy, cookie, NULL);
-	if (reply)
+	gp_r = xcb_grab_pointer_reply(dpy, gp_c, &errorp);
+	if (gp_r)
 	{
-		status = reply->status;
-		free(reply);
+		status = gp_r->status;
+		free(gp_r);
 	}
-	else
+	else if(errorp)
 	{
 		status = errp->error_code;
 	}
@@ -49,8 +49,8 @@ static int grab(xcb_window_t w, xcb_window_t constrain, int mask, xcb_cursor_t c
 
 static void ungrab(xcb_button_press_event_t *e)
 {
-	xcb_generic_event_t *ev = 0;
-	xcb_button_press_event_t *bpev = e;
+	xcb_generic_event_t *ev = NULL;
+	xcb_button_press_event_t *bpe = e;
 	xcb_generic_error_t *err;
 	
 	eprintf("e=0x%x\n", e);
@@ -61,45 +61,40 @@ static void ungrab(xcb_button_press_event_t *e)
 			ev = maskevent(dpy, (ButtonMask | XCB_EVENT_MASK_BUTTON_MOTION));
 			if ((ev->response_type & ~0x80) == XCB_MOTION_NOTIFY)
 				continue;
-			bpev = (xcb_button_press_event_t *)ev;
-			if (nobuttons(bpev))
+			bpe = (xcb_button_press_event_t *)ev;
+			if (nobuttons(bpe))
 				break;
 		}
 	}
-	xcb_ungrab_pointer_checked(dpy, bpev->time);
+	xcb_ungrab_pointer(dpy, bpe->time);
 	curtime = bpev->time;
-	if (ev != 0)
-		free(ev);
+	free(ev);
 }
 
 static void getmouse(int *x, int *y, ScreenInfo *s)
 {
-	xcb_query_pointer_cookie_t cookie;
-	xcb_query_pointer_reply_t *reply;
+	xcb_query_pointer_cookie_t qp_c;
+	xcb_query_pointer_reply_t *qp_r;
+	xcb_generic_error_t *errorp;
 
 	eprintf("x=%d y=%d s=0x%x\n", x, y, s);
-	cookie = xcb_query_pointer(dpy, s->root);
-	reply = xcb_query_pointer_reply(dpy, cookie, NULL);
-	if (reply)
+	qp_c = xcb_query_pointer(dpy, s->root);
+	qp_r = xcb_query_pointer_reply(dpy, qp_c, &errorp);
+	if (!qp_r || !qp_r->same_screen)
 	{
-		*x = reply->root_x;
-		*y = reply->root_y;
-		free(reply);
+		free(qp_r);
+		return;
 	}
-	else
-	{	/* this is broken. failure is probably because pointer is on
-			a different screen, but we don't handle failure here! */
-		fprintf(stderr, "getmouse: query pointer failed\n");
-		*x = 0;
-		*y = 0;
-	}
+
+	*x = reply->root_x;
+	*y = reply->root_y;
+	free(reply);
 }
 
 static void setmouse(int x, int y, ScreenInfo *s)
 {
 	eprintf("x=%d y=%d s=0x%x\n", x, y, s);
-	xcb_warp_pointer(dpy, XCB_NONE, s->root, XCB_NONE, XCB_NONE,
-							XCB_NONE, XCB_NONE, x, y);
+	xcb_warp_pointer(dpy, XCB_NONE, s->root, 0, 0, 0, 0, x, y);
 }
 
 int menuhit(xcb_button_press_event_t *e, Menu *m)
