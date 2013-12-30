@@ -180,7 +180,7 @@ Client * getclient(xcb_window_t w, int create)
 
 	if (create)
 	{
-		c = (Client *)xalloc(sizeof(Client));
+		c = xalloc(sizeof(Client));
 		c->window = w;
 		/* c->parent will be set by the caller */
 		c->state = XCB_ICCCM_WM_STATE_WITHDRAWN;

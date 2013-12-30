@@ -220,7 +220,7 @@ int main(int argc, char *argv[])
 #endif
 
 	num_screens = xcb_setup_roots_length(xcb_get_setup(dpy));
-	screens = (ScreenInfo *)xalloc(sizeof(ScreenInfo) * num_screens);
+	screens = xalloc(sizeof(ScreenInfo) * num_screens);
 
 	for (i = 0; i < num_screens; i++)
 		initscreen(&screens[i], i, background);

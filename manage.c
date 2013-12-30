@@ -412,7 +412,7 @@ static int _getprop(xcb_window_t w, xcb_atom_t a, xcb_atom_t type, int32_t len, 
 			length = xcb_get_property_value_length(prop_r);
 			pp = xcb_get_property_value(prop_r);
 
-			*p = (unsigned char *)xalloc(length + 1);
+			*p = xalloc(length + 1);
 			memcpy(*p, pp, length);
 			(*p)[length] = '\0';
 		}
@@ -466,7 +466,7 @@ void getcmaps(Client *c)
 	c->ncmapwins = n;
 	c->cmapwins = cw;
 
-	c->wmcmaps = (xcb_colormap_t *)malloc(n * sizeof(xcb_colormap_t));
+	c->wmcmaps = xalloc(n * sizeof(xcb_colormap_t));
 	for (i = 0; i < n; i++)
 	{
 		if (cw[i] == c->window)

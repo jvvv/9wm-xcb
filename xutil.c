@@ -140,7 +140,7 @@ uint32_t textwidth(xcb_connection_t *c, xcb_font_t font, int len, char *str)
 	xcb_char2b_t *wstr;
 
 	eprintf("font=0x%x len=%d str=%s\n", font, len, str);
-	wstr = (xcb_char2b_t *)xalloc(len * sizeof(xcb_char2b_t));
+	wstr = xalloc(len * sizeof(xcb_char2b_t));
 
 	for (i = 0; i < len; i++)
 	{

@@ -132,11 +132,11 @@ int menuhit(xcb_button_press_event_t *e, Menu *m)
 	if (cur >= n)
 		cur = n - 1;
 
-	text_items = (TextItem **)xalloc(n * sizeof(TextItem *));
+	text_items = xalloc(n * sizeof(TextItem *));
 	for (i = 0; i < n; i++)
 	{
 		len = strlen(m->item[i]);
-		text_items[i] = (TextItem *)xalloc(len + sizeof(TextItem));
+		text_items[i] = xalloc(len + sizeof(TextItem));
 		for (j = 0; j < len; j++)
 			text_items[i]->text[j] = m->item[i][j];
 		text_items[i]->nchars = len;

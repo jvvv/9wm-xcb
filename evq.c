@@ -30,8 +30,8 @@ int evq_qlen(void)
 void evq_init(void)
 {
 	eprintf("\n");
-	evq_head = (struct evqnode *)xalloc(sizeof(struct evqnode));
-	evq_tail = (struct evqnode *)xalloc(sizeof(struct evqnode));
+	evq_head = xalloc(sizeof(struct evqnode));
+	evq_tail = xalloc(sizeof(struct evqnode));
 	evq_head->event = NULL;
 	evq_tail->event = NULL;
 	evq_head->prev = evq_head;
@@ -72,7 +72,7 @@ static void evq_enq(xcb_generic_event_t *ev)
 	struct evqnode *n, *p;
 
 	eprintf("ev=0x%x (ev->response_type=%d evq_len=%d at fn start) ", ev, ev->response_type, evq_len);
-	n = (struct evqnode *)xalloc(sizeof(struct evqnode));
+	n = xalloc(sizeof(struct evqnode));
 	n->event = ev;
 	p = evq_tail->prev;
 	p->next = n;
