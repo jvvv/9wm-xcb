@@ -23,13 +23,11 @@ static int evq_len;
 
 int evq_qlen(void)
 {
-    eprintf("(evq_len=%d)\n", evq_len);
     return evq_len;
 }
 
 void evq_init(void)
 {
-    eprintf("\n");
     evq_head = xalloc(sizeof(struct evqnode));
     evq_tail = xalloc(sizeof(struct evqnode));
     evq_head->event = NULL;
@@ -45,7 +43,6 @@ void evq_destroy(void)
 {
     struct evqnode *n, *t;
 
-    eprintf("(evq_len=%d at fn start) ", evq_len);
     for (n = evq_head->next; n->next != n; ) {
         t = n;
         n = n->next;
@@ -62,14 +59,12 @@ void evq_destroy(void)
     evq_head = NULL;
     evq_tail = NULL;
     evq_len = 0;
-    eprintf("(evq_len=%d at fn end)\n", evq_len);
 }
 
 static void evq_enq(xcb_generic_event_t *ev)
 {
     struct evqnode *n, *p;
 
-    eprintf("ev=0x%x (ev->response_type=%d evq_len=%d at fn start) ", ev, ev->response_type, evq_len);
     n = xalloc(sizeof(struct evqnode));
     n->event = ev;
     p = evq_tail->prev;
@@ -79,7 +74,6 @@ static void evq_enq(xcb_generic_event_t *ev)
     evq_tail->prev = n;
 
     evq_len++;
-    eprintf("(evq_len=%d at fn end)\n", evq_len);
 }
 
 xcb_generic_event_t *evq_deq(struct evqnode *node)
@@ -87,7 +81,6 @@ xcb_generic_event_t *evq_deq(struct evqnode *node)
     struct evqnode *n, *p;
     xcb_generic_event_t *ev;
 
-    eprintf("node=0x%x (evq_len=%d at fn start) ", node, evq_len);
     if ((evq_len == 0) || (evq_head->next == evq_tail)) {
         fprintf(stderr, "evq_deq: empty queue dequeue\n");
         exit(EXIT_FAILURE);
@@ -116,7 +109,6 @@ xcb_generic_event_t *evq_deq(struct evqnode *node)
         exit(EXIT_FAILURE);
     }
 
-    eprintf("(evq_len=%d at fn end) ", node, evq_len);
     return ev;
 }
 
@@ -124,7 +116,6 @@ xcb_generic_event_t *getevent(xcb_connection_t *c)
 {
     xcb_generic_event_t *ev;
 
-    eprintf("(evq_len=%d at fn start) \n", evq_len);
     if (evq_len != 0)
         return evq_deq(NULL);
 
@@ -229,7 +220,6 @@ xcb_generic_event_t *_maskevent(xcb_connection_t *c, uint32_t mask, int poll)
     xcb_generic_event_t *ev;
     struct evqnode *n;
 
-    eprintf("mask=%d poll=%d (evq_len=%d at fn start) \n", mask, poll, evq_len);
     if (evq_len != 0)
         for (n = evq_head->next; n != evq_tail; n = n->next)
             if (evq_check_mask(n->event->response_type, mask))

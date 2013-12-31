@@ -17,7 +17,6 @@ xcb_atom_t xinternatom(xcb_connection_t *c, char *name, uint8_t only_if_exists)
     xcb_intern_atom_reply_t *reply;
     xcb_generic_error_t *errorp;
 
-    eprintf("name=%s only_if_exists=%d\n", name, only_if_exists);
     cookie = xcb_intern_atom(c, only_if_exists, strlen(name), name);
     reply = xcb_intern_atom_reply(c, cookie, &errorp);
     if (reply) {
@@ -38,7 +37,6 @@ xcb_query_font_reply_t *xloadqueryfont (xcb_connection_t *c, char *fname, xcb_fo
     xcb_query_font_reply_t *qf_r;
     xcb_font_t font;
 
-    eprintf("fname=%s ret=0x%x\n", fname, ret);
     font = xcb_generate_id(c);
     cookie = xcb_open_font_checked(c, font, strlen(fname), fname);
     errorp = xcb_request_check(c, cookie);
@@ -58,7 +56,6 @@ xcb_query_font_reply_t *xloadqueryfont (xcb_connection_t *c, char *fname, xcb_fo
 
 void xselectinput(xcb_connection_t *c, xcb_window_t w, uint32_t mask)
 {
-    eprintf("w=0x%x mask=%d\n", w, mask);
     xcb_change_window_attributes(c, w, XCB_CW_EVENT_MASK, &mask);
 }
 
@@ -66,7 +63,6 @@ void xmovewindow(xcb_connection_t *c, xcb_window_t w, int x, int y)
 {
     xcb_params_configure_window_t wc;
 
-    eprintf("w=0x%x x=%d y=%d\n", w, x, y);
     wc.x = x;
     wc.y = y;
     xcb_aux_configure_window(c, w, XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y, &wc);
@@ -76,7 +72,6 @@ void xresizewindow(xcb_connection_t *c, xcb_window_t w, uint32_t width, uint32_t
 {
     xcb_params_configure_window_t wc;
 
-    eprintf("w=0x%x width=%d height=%d\n", w, width, height);
     wc.width = width;
     wc.height = height;
     xcb_aux_configure_window(c, w, XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT, &wc);
@@ -87,7 +82,6 @@ void xmoveresizewindow(xcb_connection_t *c, xcb_window_t w,
 {
     xcb_params_configure_window_t wc;
 
-    eprintf("w=0x%x x=%d y=%d width=%d height=%d\n", w, x, y, width, height);
     wc.x = x;
     wc.y = y;
     wc.width = width;
@@ -101,7 +95,6 @@ void xmoveresizewindow(xcb_connection_t *c, xcb_window_t w,
 void xmapraised(xcb_connection_t *c, xcb_window_t w)
 {
     uint32_t value = XCB_STACK_MODE_ABOVE;
-    eprintf("w=0x%x\n", w);
     xcb_configure_window(c, w, XCB_CONFIG_WINDOW_STACK_MODE, &value);
     xcb_map_window(c, w);
 }
@@ -109,7 +102,6 @@ void xmapraised(xcb_connection_t *c, xcb_window_t w)
 void xraisewindow(xcb_connection_t *c, xcb_window_t w)
 {
     uint32_t value = XCB_STACK_MODE_ABOVE;
-    eprintf("w=0x%x\n", w);
     xcb_configure_window(c, w, XCB_CONFIG_WINDOW_STACK_MODE, &value);
 }
 
@@ -136,7 +128,6 @@ uint32_t textwidth(xcb_connection_t *c, xcb_font_t font, int len, char *str)
     uint32_t width;
     xcb_char2b_t *wstr;
 
-    eprintf("font=0x%x len=%d str=%s\n", font, len, str);
     wstr = xalloc(len * sizeof(xcb_char2b_t));
 
     for (i = 0; i < len; i++) {

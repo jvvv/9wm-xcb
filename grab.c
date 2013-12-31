@@ -12,7 +12,6 @@ static int nobuttons(xcb_button_press_event_t *e)   /* Einstuerzende */
 {
     int state;
 
-    eprintf("e=0x%x\n", e);
     state = (e->state & AllButtonMask);
     return ((e->response_type == XCB_BUTTON_RELEASE) &&
             ((state & (state - 1)) == 0));
@@ -24,8 +23,6 @@ static int grab(xcb_window_t w, xcb_window_t constrain, int mask, xcb_cursor_t c
     xcb_grab_pointer_cookie_t gp_c;
     xcb_grab_pointer_reply_t *gp_r;
     xcb_generic_error_t *errorp;
-
-    eprintf("w=0x%x constrain=0x%x mask=%d curs=%d t=%d\n", w, constrain, mask, curs, t);
 
     if (!t)
         t = timestamp();
@@ -51,7 +48,6 @@ static void ungrab(xcb_button_press_event_t *e)
     xcb_button_press_event_t *bpe = e;
     xcb_generic_error_t *err;
     
-    eprintf("e=0x%x\n", e);
     if (!nobuttons(bpe)) {
         for (;;) {
             ev = maskevent(dpy, (ButtonMask | XCB_EVENT_MASK_BUTTON_MOTION));
@@ -73,7 +69,6 @@ static void getmouse(int *x, int *y, ScreenInfo *s)
     xcb_query_pointer_reply_t *qp_r;
     xcb_generic_error_t *errorp;
 
-    eprintf("x=%d y=%d s=0x%x\n", x, y, s);
     qp_c = xcb_query_pointer(dpy, s->root);
     qp_r = xcb_query_pointer_reply(dpy, qp_c, &errorp);
     if (!qp_r || !qp_r->same_screen) {
@@ -88,7 +83,6 @@ static void getmouse(int *x, int *y, ScreenInfo *s)
 
 static void setmouse(int x, int y, ScreenInfo *s)
 {
-    eprintf("x=%d y=%d s=0x%x\n", x, y, s);
     xcb_warp_pointer(dpy, XCB_NONE, s->root, 0, 0, 0, 0, x, y);
 }
 
@@ -106,7 +100,6 @@ int menuhit(xcb_button_press_event_t *e, Menu *m)
     xcb_params_cw_t attr;
     xcb_params_gc_t gv;
 
-    eprintf("e=0x%x m=0x%x\n", e, m);
     if (font == 0)
         return -1;
     s = getscreen(e->root);
@@ -275,7 +268,6 @@ Client * selectwin(int release, int *shift, ScreenInfo *s)
     xcb_window_t w;
     Client *c;
 
-    eprintf("release=%d shift=0x%x s=0x%x\n", release, shift, s);
     status = grab(s->root, s->root, ButtonMask, s->target, 0);
     if (status != XCB_GRAB_STATUS_SUCCESS) {
         graberror("selectwin", status); /* */
@@ -321,7 +313,6 @@ static void sweepcalc(Client *c, int x, int y)
 {
     int dx, dy, sx, sy;
 
-    eprintf("c=0x%x x=%d y=%d\n", c, x, y);
     dx = x - c->x;
     dy = y - c->y;
     sx = sy = 1;
@@ -361,7 +352,6 @@ static void sweepcalc(Client *c, int x, int y)
 
 static void dragcalc(Client *c, int x, int y)
 {
-    eprintf("c=0x%x x=%d y=%d\n", c, x, y);
     c->x = x;
     c->y = y;
 }
@@ -372,7 +362,6 @@ static void drawbound(Client *c)
     ScreenInfo *s;
     xcb_rectangle_t rects[2];
 
-    eprintf("c=0x%x\n", c);
     s = c->screen;
     x = c->x;
     y = c->y;
@@ -406,7 +395,6 @@ static void misleep(int msec)
 {
     struct timeval t;
 
-    eprintf("msec=%d\n", msec);
     t.tv_sec = msec / 1000;
     t.tv_usec = (msec % 1000) * 1000;
     select(0, 0, 0, 0, &t);
@@ -420,7 +408,6 @@ static int sweepdrag(Client *c, xcb_button_press_event_t *e0, void (*recalc)())
     int cx, cy, rx, ry;
     int ox, oy, odx, ody;
 
-    eprintf("c=0x%x e0=0x%x recalc=0x%x\n", c, e0, recalc);
     ox = c->x;
     oy = c->y;
     odx = c->dx;
@@ -509,7 +496,6 @@ int sweep(Client *c)
     xcb_button_press_event_t *e;
     ScreenInfo *s;
 
-    eprintf("c=0x%x\n", c);
     s = c->screen;
     status = grab(s->root, s->root, ButtonMask, s->sweep0, 0);
     if (status != XCB_GRAB_STATUS_SUCCESS) {
@@ -536,7 +522,6 @@ int drag(Client *c)
     int status;
     ScreenInfo *s;
 
-    eprintf("c=0x%x\n", c);
     s = c->screen;
     if (c->init)
         setmouse(c->x - BORDER, c->y - BORDER, s);

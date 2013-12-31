@@ -24,7 +24,6 @@ int manage(Client *c, int mapped)
     if (!c)
         return 0;
 
-    eprintf("c=0x%x mapped=%d (c->window=0x%x)\n", c, mapped, c->window);
     trace("manage", c, 0);
     xselectinput(dpy, c->window, (XCB_EVENT_MASK_COLOR_MAP_CHANGE |
                     XCB_EVENT_MASK_ENTER_WINDOW |
@@ -182,7 +181,6 @@ void scanwins(ScreenInfo *s)
     xcb_get_geometry_cookie_t ggeo_c;
     xcb_get_geometry_reply_t *ggeo_r;
 
-    eprintf("s=0x%x\n", s);
     qtr_c = xcb_query_tree_unchecked(dpy, s->root);
     qtr_r = xcb_query_tree_reply(dpy, qtr_c, NULL);
     if (qtr_r) {
@@ -234,8 +232,6 @@ void gettrans(Client *c)
     if (!c)
         return;
 
-    eprintf("c=0x%x (c->window=0x%x)\n", c, c->window);
-
     prop_c = xcb_icccm_get_wm_transient_for_unchecked(dpy, c->window);
     if(xcb_icccm_get_wm_transient_for_reply(dpy, prop_c, &trans, NULL))
         c->trans = trans;
@@ -247,8 +243,6 @@ void withdraw(Client *c)
 {
     if (!c)
         return;
-
-    eprintf("c=0x%x (c->window=0x%x)\n", c, c->window);
 
     xcb_unmap_window(dpy, c->parent);
     gravitate(c, 1);
@@ -269,8 +263,6 @@ void gravitate(Client *c, int invert)
 
     if (!c)
         return;
-
-    eprintf("c=0x%x invert=%d (c->window=0x%x)\n", c, invert, c->window);
 
     gravity = XCB_GRAVITY_NORTH_WEST;
     if (c->size.flags & XCB_ICCCM_SIZE_HINT_P_WIN_GRAVITY)
@@ -331,8 +323,6 @@ void gravitate(Client *c, int invert)
 
 static void installcmap(ScreenInfo *s, xcb_colormap_t cmap)
 {
-    eprintf("s=0x%x cmap=%d\n", s, cmap);
-
     if (cmap == XCB_NONE)
         xcb_install_colormap(dpy, s->def_cmap);
     else
@@ -346,8 +336,6 @@ void cmapfocus(Client *c)
 
     if (!c)
         return;
-
-    eprintf("c=0x%x (c->window=0x%x)\n", c, c->window);
 
     if (c->ncmapwins != 0) {
         found = 0;
@@ -369,8 +357,6 @@ void cmapfocus(Client *c)
 
 void cmapnofocus(ScreenInfo *s)
 {
-    eprintf("s=0x%x\n", s);
-
     installcmap(s, XCB_NONE);
 }
 
@@ -420,8 +406,6 @@ void getcmaps(Client *c)
     if (!c)
         return;
 
-    eprintf("c=0x%x (c->window=0x%x)\n", c, c->window);
-
     if (!c->init) {
         gatt_c = xcb_get_window_attributes_unchecked(dpy, c->window);
         gatt_r = xcb_get_window_attributes_reply(dpy, gatt_c, NULL);
@@ -468,8 +452,6 @@ void setlabel(Client *c)
     if (!c)
         return;
 
-    eprintf("c=0x%x (c->window=0x%x)\n", c, c->window);
-
     if (c->iconname != 0)
         label = c->iconname;
     else if (c->name != 0)
@@ -494,8 +476,6 @@ void setshape(Client *c)
     if (!c)
         return;
 
-    eprintf("c=0x%x (c->window=0x%x)\n", c, c->window);
-
     shape_c = xcb_shape_get_rectangles_unchecked(dpy, c->window,
                         XCB_SHAPE_SK_BOUNDING);
     shape_r = xcb_shape_get_rectangles_reply(dpy, shape_c, NULL);
@@ -515,8 +495,6 @@ char *getprop(xcb_window_t w, xcb_atom_t a)
 {
     void *p;
 
-    eprintf("w=0x%x a=%d\n", w, a);
-
     if (_getprop(w, a, XCB_ATOM_STRING, 100L, (unsigned char **)&p) <= 0)
         return 0;
     return (char *)p;
@@ -527,8 +505,6 @@ int get1prop(xcb_window_t w, xcb_atom_t a, xcb_atom_t type)
     void **p;
     int x;
 
-    eprintf("w=0x%x a=%d type=%d\n", w, a, type);
-
     if (_getprop(w, a, type, 1L, (unsigned char **)p) <= 0)
         return 0;
     memcpy(&x, *p, sizeof(int));
@@ -538,15 +514,11 @@ int get1prop(xcb_window_t w, xcb_atom_t a, xcb_atom_t type)
 
 xcb_window_t getwprop(xcb_window_t w, xcb_atom_t a)
 {
-    eprintf("w=0x%x a=%d\n", w, a);
-
     return get1prop(w, a, XCB_ATOM_WINDOW);
 }
 
 int getiprop(xcb_window_t w, xcb_atom_t a)
 {
-    eprintf("w=0x%x a=%d\n", w, a);
-
     return get1prop(w, a, XCB_ATOM_INTEGER);
 }
 
@@ -556,8 +528,6 @@ void set_state(Client *c, int state)
 
     if (!c)
         return;
-
-    eprintf("c=0x%x state=%d (c->window=0x%x)\n", c, state, c->window);
 
     values[0] = state;
     values[1] = XCB_NONE;
@@ -572,8 +542,6 @@ int get_state(xcb_window_t w, int *state)
 {
     void *p = 0;
 
-    eprintf("w=0x%x state=0x%x\n", w, state);
-    
     if (!w)
         return;
 
@@ -594,8 +562,6 @@ void getproto(Client *c)
 
     if (!c)
         return;
-
-    eprintf("c=0x%x (c->window=0x%x)\n", c, c->window);
 
     w = c->window;
     c->proto = 0;

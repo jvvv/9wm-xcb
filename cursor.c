@@ -147,8 +147,6 @@ static xcb_cursor_t getcursor(Cursordata *c, ScreenInfo *s)
     xcb_pixmap_t f, m;
     xcb_cursor_t cursor;
 
-    eprintf("c=0x%x s=0x%x\n", c, s);
-
     f = xcb_create_pixmap_from_bitmap_data(dpy, s->root, c->fore,
         c->width, c->width, 1, 1, 0, NULL);
     m = xcb_create_pixmap_from_bitmap_data(dpy, s->root, c->mask,
@@ -168,8 +166,6 @@ void initcurs(ScreenInfo *s)
     xcb_alloc_named_color_cookie_t cookie;
     xcb_alloc_named_color_reply_t *reply;
     uint32_t depth = 0;
-
-    eprintf("s=0x%d\n", s);
 
     cookie = xcb_alloc_named_color_unchecked(dpy, s->def_cmap,
                 strlen("black"), "black");

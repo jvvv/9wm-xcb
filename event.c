@@ -13,14 +13,12 @@ void mainloop(int shape_event)
 {
     xcb_generic_event_t *ev;
 
-    eprintf("shape_event=%d\n", shape_event);
-
     for (;;) {
         ev = getevent(dpy);
 
 #ifdef  DEBUG_EV
         if (debug) {
-            eprintf("evq_len=%d\n", evq_qlen());
+            eprintf("mainloop: evq_len=%d\n", evq_qlen());
             showevent(ev);
         }
 #endif
@@ -94,7 +92,7 @@ void mainloop(int shape_event)
                 /* not interested */
                 eprintf("%s\n", gettype(ev));
                 trace("ignore", 0, ev);
-                break;
+;                break;
         }
         xcb_flush(dpy);
         free(ev);
@@ -105,8 +103,6 @@ void configurereq(xcb_configure_request_event_t *e)
 {
     xcb_params_configure_window_t wc;
     Client *c;
-
-    eprintf("e=0x%x\n", e);
 
     /* we don't set curtime as nothing here uses it */
     c = getclient(e->window, 0);
@@ -172,8 +168,6 @@ void mapreq(xcb_map_request_event_t *e)
     Client *c;
     int i;
 
-    eprintf("e=0x%x\n", e);
-
     curtime = XCB_CURRENT_TIME;
     c = getclient(e->window, 0);
     trace("mapreq", c, e);
@@ -220,8 +214,6 @@ void mapreq(xcb_map_request_event_t *e)
 void unmap(xcb_unmap_notify_event_t *e)
 {
     Client *c;
-
-    eprintf("e=0x%x\n", e);
 
     curtime = XCB_CURRENT_TIME;
     c = getclient(e->window, 0);
@@ -275,7 +267,6 @@ void destroy(xcb_destroy_notify_event_t *e)
 {
     Client *c;
 
-    eprintf("e=0x%x\n", e);
     curtime = XCB_CURRENT_TIME;
     c = getclient(e->window, 0);
     if (c == 0)
@@ -294,7 +285,6 @@ void clientmesg(xcb_client_message_event_t *e)
 {
     Client *c;
 
-    eprintf("e=0x%x\n", e);
     curtime = XCB_CURRENT_TIME;
     if (e->type == exit_9wm) {
         cleanup();
@@ -330,7 +320,6 @@ void cmap(xcb_colormap_notify_event_t *e)
     Client *c;
     int i;
 
-    eprintf("e=0x%x\n", e);
     /* we don't set curtime as nothing here uses it */
     if (e->_new) {
         c = getclient(e->window, 0);
@@ -360,7 +349,6 @@ void property(xcb_property_notify_event_t *e)
     int delete;
     Client *c;
 
-    eprintf("e=0x%x\n", e);
     /* we don't set curtime as nothing here uses it */
     a = e->atom;
     delete = (e->state == XCB_PROPERTY_DELETE);
@@ -404,7 +392,6 @@ void reparent(xcb_reparent_notify_event_t *e)
     xcb_generic_error_t *errorp;
     ScreenInfo *s;
 
-    eprintf("e=0x%x\n", e);
     /* we don't set curtime as nothing here uses it */
     if (!getscreen(e->event) || e->override_redirect)
         return;
@@ -443,7 +430,6 @@ void shapenotify(xcb_shape_notify_event_t *e)
 {
     Client *c;
 
-    eprintf("e=0x%x\n", e);
     /* we don't set curtime as nothing here uses it */
     c = getclient(e->affected_window, 0);
     if (c == 0)
@@ -458,7 +444,6 @@ void enter(xcb_enter_notify_event_t *e)
     Client *c;
     uint32_t values[2];
 
-    eprintf("e=0x%x\n", e);
     curtime = e->time;
     if ((e->mode != XCB_NOTIFY_MODE_GRAB) ||
         (e->detail != XCB_NOTIFY_DETAIL_NONLINEAR_VIRTUAL))
@@ -477,7 +462,6 @@ void focusin(xcb_focus_in_event_t *e)
     Client *c;
     uint32_t values[2];
 
-    eprintf("e=0x%x\n", e);
     curtime = XCB_CURRENT_TIME;
     if (e->detail != XCB_NOTIFY_DETAIL_NONLINEAR_VIRTUAL)
         return;

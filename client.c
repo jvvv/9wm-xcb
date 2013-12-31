@@ -17,8 +17,6 @@ void setactive(Client *c, int on)
         return;
     }
 
-    eprintf("c=0x%x on=%d (c->window=0x%x)\n", c, on, c->window);
-
     if (c->parent == c->screen->root) {
         fprintf(stderr, "9wm: bad parent in setactive; dumping core\n");
         abort();
@@ -51,8 +49,6 @@ void draw_border(Client *c, int active)
         return;
     }
 
-    eprintf("c=0x%x active=%d (c->window=0x%x)\n", c, active, c->window);
-
     value = active ? c->screen->black : c->screen->white;
     xcb_change_window_attributes(dpy, c->parent, XCB_CW_BACK_PIXEL, &value);
     xcb_clear_area(dpy, 0, c->parent, 0, 0, 0, 0);
@@ -73,8 +69,6 @@ void active(Client *c)
         eprintf("null client\n");
         return;
     }
-
-    eprintf("c=0x%x (c->window=0x%x)\n", c, c->window);
 
     if (c == current)
         return;
@@ -138,8 +132,6 @@ void top(Client *c)
         return;
     }
 
-    eprintf("c=0x%x (c->window=0x%x\n", c, c->window);
-
     l = &clients;
     for (cc = *l; cc; cc = *l) {
         if (cc == c) {
@@ -156,8 +148,6 @@ void top(Client *c)
 Client * getclient(xcb_window_t w, int create)
 {
     Client *c = NULL;
-
-    eprintf("w=0x%x create=%d\n", w, create);
 
     if (w == 0 || getscreen(w))
         return 0;
@@ -186,8 +176,6 @@ void rmclient(Client *c)
         eprintf("null client\n");
         return;
     }
-
-    eprintf("c=0x%x (c->window=0x%x)\n");
 
     for (cc = current; cc && cc->revert; cc = cc->revert)
         if (cc->revert == c)
@@ -239,7 +227,6 @@ void dump_revert(void)
     int i;
 
     eprintf("(dump follows)\n");
-
     i = 0;
     for (c = current; c; c = c->revert) {
         fprintf(stderr, "%s(%x:%d)", c->label ? c->label : "?", c->window, c->state);

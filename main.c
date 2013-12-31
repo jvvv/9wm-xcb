@@ -239,8 +239,6 @@ void initscreen(ScreenInfo *s, int i, int background)
     xcb_params_cw_t attr;
     xcb_screen_t *scr;
 
-    eprintf("s=%d i=%d background=%d\n", s, i, background);
-    
     scr = xcb_aux_get_screen(dpy, i);
     s->num = i;
     s->root = scr->root;
@@ -303,8 +301,6 @@ ScreenInfo *getscreen(xcb_window_t w)
 {
     int i;
 
-    eprintf("w=0x%x\n", w);
-
     for (i = 0; i < num_screens; i++)
         if (screens[i].root == w)
             return &screens[i];
@@ -324,7 +320,6 @@ xcb_timestamp_t timestamp(void)
         ev = maskevent(dpy, XCB_EVENT_MASK_PROPERTY_CHANGE);
         curtime = ((xcb_property_notify_event_t *)ev)->time;
     }
-    eprintf("curtime=%d\n", curtime);
     return curtime;
 }
 
@@ -332,8 +327,6 @@ void sendcmessage(xcb_window_t w, xcb_atom_t a, long x, int isroot)
 {
     xcb_client_message_event_t ev;
     uint32_t mask;
-
-    eprintf("w=0x%x a=0x%x x=0x%x isroot=%d\n", w, a, x, isroot);
 
     memset(&ev, 0, sizeof(xcb_client_message_event_t));
     ev.response_type = XCB_CLIENT_MESSAGE;
@@ -355,8 +348,6 @@ void sendconfig(Client *c)
     if (!c)
         return;
         
-    eprintf("c=0x%x (c->window=0x%x)\n", c, c->window);
-
     ce.response_type = XCB_CONFIGURE_NOTIFY;
     ce.event = c->window;
     ce.window = c->window;
@@ -373,14 +364,12 @@ void sendconfig(Client *c)
 
 void sighandler(int signum)
 {
-    eprintf("signum=%d\n", signum);
     signalled = 1;
 }
 
 void sigchldhandler(int signum)
 {
-    eprintf("signum=%d\n", signum);
-    while (waitpid(-1, NULL, WNOHANG) > 0);
+    while (waitpid(-1, NULL, WNOHANG) > 0) ;
 }
 
 void cleanup()
@@ -389,8 +378,6 @@ void cleanup()
     uint32_t values[2];
     xcb_params_configure_window_t wc;
     int i;
-
-    eprintf("\n");
 
     /* order of un-reparenting determines final stacking order... */
     cc[0] = cc[1] = 0;

@@ -144,7 +144,6 @@ void reshape(Client *c)
     int odx, ody;
     uint32_t values[2];
 
-    eprintf("c=0x%x (c->window=0x%x)\n", c, c->window);
     if (c == 0)
         return;
     odx = c->dx;
@@ -166,7 +165,6 @@ void move(Client *c)
 {
     uint32_t values[2];
 
-    eprintf("c=0x%x (c->window=0x%x)\n", c, c->window);
     if (c == 0)
         return;
     if (drag(c) == 0)
@@ -180,7 +178,6 @@ void move(Client *c)
 
 void delete(Client *c, int shift)
 {
-    eprintf("c=0x%x shift=%d (c->window=0x%x)\n", c, shift, c->window);
     if (c == 0)
         return;
     if ((c->proto & Pdelete) && !shift)
@@ -191,7 +188,6 @@ void delete(Client *c, int shift)
 
 void hide(Client *c)
 {
-    eprintf("c=0x%x (c->window=0x%x)\n", c, c->window);
     if (c == 0 || numhidden == MAXHIDDEN)
         return;
     if (hidden(c)) {
@@ -215,7 +211,6 @@ void unhide(int n, int map)
     int i;
     uint32_t values[2];
 
-    eprintf("n=%d map=%d\n", n, map);
     if (n >= numhidden) {
         fprintf(stderr, "9wm: unhide: n %d numhidden %d\n", n, numhidden);
         return;
@@ -247,7 +242,6 @@ void unhidec(Client *c, int map)
 {
     int i;
 
-    eprintf("c=0x%x map=%d (c->window=0x%x)\n", c, map, c->window);
     for (i = 0; i < numhidden; i++)
         if (c == hiddenc[i]) {
             unhide(i, map);
@@ -261,7 +255,6 @@ void renamec(Client *c, char *name)
 {
     int i;
 
-    eprintf("c=0x%x name=%s (c->window=0x%x)\n", c, name, c->window);
     if (name == 0)
         name = "???";
     c->label = name;
