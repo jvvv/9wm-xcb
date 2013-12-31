@@ -2,12 +2,12 @@
 #include <xcb/xcb.h>
 #include <xcb/shape.h>
 
-#ifdef	DEBUG
-#define	trace(s, c, e)	dotrace((s), (c), (e))
+#ifdef  DEBUG
+#define trace(s, c, e)  dotrace((s), (c), (e))
 #define eprintf(...) fprintf(stderr, "%s:%d:%s(): ", __FILE__, __LINE__, __func__);\
-	fprintf(stderr, __VA_ARGS__)
+    fprintf(stderr, __VA_ARGS__)
 #else
-#define	trace(s, c, e)
+#define trace(s, c, e)
 #define eprintf(...)
 #endif
 
