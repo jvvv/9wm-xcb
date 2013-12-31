@@ -92,7 +92,7 @@ void mainloop(int shape_event)
                 /* not interested */
                 eprintf("%s\n", gettype(ev));
                 trace("ignore", 0, ev);
-;                break;
+                break;
         }
         xcb_flush(dpy);
         free(ev);
