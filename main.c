@@ -27,7 +27,7 @@ int             nostalgia;
 char            **myargv;
 char            *termprog;
 char            *shell;
-uint8_t         shape;
+uint8_t         shape = false;
 int             _border = 4;
 int             _inset = 1;
 int             curtime;
@@ -191,22 +191,15 @@ int main(int argc, char *argv[])
         _inset--;
     }
 
-#ifdef  SHAPE
-    shape = false;
     const xcb_query_extension_reply_t *ext_reply;
-    xcb_shape_query_version_cookie_t shape_ver_cookie;
-    xcb_shape_query_version_reply_t *shape_ver_reply;
-
     xcb_prefetch_extension_data(dpy, &xcb_shape_id);
+
+#ifdef  SHAPE
     ext_reply = xcb_get_extension_data(dpy, &xcb_shape_id);
-    if (ext_reply) {
-        shape_ver_cookie = xcb_shape_query_version_unchecked(dpy);
-        shape_ver_reply = xcb_shape_query_version_reply(dpy, shape_ver_cookie, NULL);
-        if (shape_ver_reply) {
-            shape = true;
-            shape_event = ext_reply->first_event;
-            free(shape_ver_reply);
-        }
+    if (ext_reply->present) {
+        shape = true;
+        shape_event = ext_reply->first_event;
+        free(shape_ver_reply);
     }
 #endif
 
