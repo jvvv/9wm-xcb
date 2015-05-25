@@ -199,7 +199,6 @@ int main(int argc, char *argv[])
     if (ext_reply->present) {
         shape = true;
         shape_event = ext_reply->first_event;
-        free(shape_ver_reply);
     }
 #endif
 
